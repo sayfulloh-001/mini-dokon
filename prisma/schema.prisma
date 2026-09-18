@@ -1,0 +1,138 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Store {
+  id               String             @id @default(cuid())
+  name             String
+  code             String?            @unique // 6 xonali do'kon ID kodi (masalan: 123456)
+  ipAddress        String?            @unique
+  status           String             @default("ACTIVE")
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  users            User[]
+  sessions         Session[]
+  debtors          Debtor[]
+  debtTransactions DebtTransaction[]
+  saleTransactions SaleTransaction[]
+  cashTransactions CashTransaction[]
+
+  @@index([status])
+}
+
+model User {
+  id              String    @id @default(cuid())
+  storeId         String
+  firstName       String
+  lastName        String
+  phone           String
+  normalizedPhone String    @unique
+  passwordHash    String
+  role            String    @default("OWNER") // OWNER, SELLER
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  store           Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  sessions        Session[]
+
+  @@index([storeId])
+  @@index([normalizedPhone])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  storeId   String
+  ipAddress String?
+  userAgent String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([storeId])
+  @@index([userId])
+}
+
+model Debtor {
+  id              String            @id @default(cuid())
+  storeId         String
+  firstName       String
+  lastName        String
+  phone           String
+  normalizedPhone String
+  balance         Int               @default(0) // Butun so'm UZS
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  deletedAt       DateTime?
+
+  store           Store             @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  transactions    DebtTransaction[]
+
+  @@index([storeId])
+  @@index([normalizedPhone])
+  @@index([storeId, normalizedPhone])
+  @@index([storeId, deletedAt])
+  @@index([storeId, balance])
+}
+
+model DebtTransaction {
+  id          String   @id @default(cuid())
+  storeId     String
+  debtorId    String
+  type        String   // "DEBT_ADD", "DEBT_PAYMENT", "ADJUSTMENT"
+  amount      Int      // Butun so'm UZS
+  description String?
+  createdAt   DateTime @default(now())
+
+  store       Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  debtor      Debtor   @relation(fields: [debtorId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+  @@index([debtorId])
+  @@index([createdAt])
+  @@index([storeId, createdAt])
+  @@index([storeId, debtorId])
+}
+
+model SaleTransaction {
+  id        String   @id @default(cuid())
+  storeId   String
+  amount    Int      // Butun so'm UZS
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+  @@index([createdAt])
+  @@index([storeId, createdAt])
+}
+
+model CashTransaction {
+  id          String   @id @default(cuid())
+  storeId     String
+  type        String   // "INCOME", "EXPENSE"
+  amount      Int      // Butun so'm UZS
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  store       Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+  @@index([type])
+  @@index([createdAt])
+  @@index([storeId, type])
+  @@index([storeId, createdAt])
+}
