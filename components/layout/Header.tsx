@@ -3,8 +3,10 @@
 import React, { useState, Suspense } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Store, LogOut, Banknote, Users, BarChart3, KeyRound, Globe } from "lucide-react";
+import { Store, LogOut, Banknote, Users, BarChart3, KeyRound, Globe, Download } from "lucide-react";
 import { ConfirmDialog } from "../ui/ConfirmDialog";
+import { usePwaInstall } from "../pwa/usePwaInstall";
+import { InstallModal } from "../pwa/InstallModal";
 
 interface HeaderProps {
   storeName?: string;
@@ -20,6 +22,8 @@ function HeaderContent({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentCode = storeCode || searchParams.get("code") || "";
+
+  const { isInstalled, promptInstall, showIosGuide, setShowIosGuide, isIos } = usePwaInstall();
 
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -75,14 +79,27 @@ function HeaderContent({
             </div>
           </div>
 
-          <button
-            onClick={() => setShowLogoutModal(true)}
-            className="flex items-center gap-1 px-2.5 py-1 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium text-xs cursor-pointer"
-            title="Tizimdan chiqish"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Chiqish</span>
-          </button>
+          <div className="flex items-center gap-1.5">
+            {!isInstalled && (
+              <button
+                onClick={promptInstall}
+                className="flex items-center gap-1 px-2.5 py-1 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-all font-bold text-xs cursor-pointer shadow-2xs"
+                title="Ilovani o‘rnatish / yuklab olish"
+              >
+                <Download className="w-3.5 h-3.5 text-emerald-600" />
+                <span className="hidden sm:inline">Yuklab olish</span>
+              </button>
+            )}
+
+            <button
+              onClick={() => setShowLogoutModal(true)}
+              className="flex items-center gap-1 px-2.5 py-1 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium text-xs cursor-pointer"
+              title="Tizimdan chiqish"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Chiqish</span>
+            </button>
+          </div>
         </div>
 
         {/* 2. Shuni pastida: 3 ta Menyu (NARX, QARZ, NATIJA) */}
@@ -121,8 +138,14 @@ function HeaderContent({
         message="Haqiqatan ham chiqmoqchimisiz? Do‘koningiz 6 xonali ID kodi orqali istalgan qurilmadan yana kirishingiz mumkin."
         confirmText="Chiqish"
         cancelText="Bekor qilish"
-        isDangerous={false}
         isLoading={isLoggingOut}
+      />
+
+      {/* PWA Install Guide Modal */}
+      <InstallModal
+        isOpen={showIosGuide}
+        onClose={() => setShowIosGuide(false)}
+        isIos={isIos}
       />
     </>
   );

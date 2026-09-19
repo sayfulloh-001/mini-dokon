@@ -4,7 +4,13 @@ import { AntiInspect } from "@/components/security/AntiInspect";
 
 export const metadata: Metadata = {
   title: "SY Tizim",
-  description: "SY Tizim — Tezkor do‘kon boshqaruvi",
+  description: "SY Tizim — Tezkor va qulay do‘kon boshqaruvi",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "SY Tizim",
+  },
   icons: {
     icon: "/icon.svg",
     shortcut: "/icon.svg",
@@ -17,6 +23,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  themeColor: "#059669",
 };
 
 export default function RootLayout({

@@ -2,10 +2,13 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Store, ArrowRight, AlertCircle, Globe, KeyRound } from "lucide-react";
+import { Store, ArrowRight, AlertCircle, Globe, KeyRound, Download } from "lucide-react";
+import { usePwaInstall } from "@/components/pwa/usePwaInstall";
+import { InstallModal } from "@/components/pwa/InstallModal";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { isInstalled, promptInstall, showIosGuide, setShowIosGuide, isIos } = usePwaInstall();
   const [inputVal, setInputVal] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -109,7 +112,28 @@ export default function LoginPage() {
             )}
           </button>
         </form>
+
+        {/* Agar o'rnatilmagan bo'lsa: Ilovani yuklab olish tugmasi */}
+        {!isInstalled && (
+          <div className="mt-5 pt-4 border-t border-slate-100 text-center">
+            <button
+              type="button"
+              onClick={promptInstall}
+              className="w-full py-3 px-4 rounded-2xl bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 border border-emerald-200 text-emerald-800 text-xs font-extrabold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
+            >
+              <Download className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>Ilovani yuklab olish (Telefonga o‘rnatish)</span>
+            </button>
+          </div>
+        )}
       </div>
+
+      {/* PWA Install Guide Modal */}
+      <InstallModal
+        isOpen={showIosGuide}
+        onClose={() => setShowIosGuide(false)}
+        isIos={isIos}
+      />
     </main>
   );
 }
