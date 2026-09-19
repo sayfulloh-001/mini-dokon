@@ -4,7 +4,7 @@
   "description": "DO‘KON BOSHQARUVI - Professional Store Management Web Application",
   "scripts": {
     "dev": "next dev",
-    "build": "prisma db push && prisma generate && next build",
+    "build": "node scripts/build.js",
     "start": "next start",
     "lint": "next lint",
     "prisma:generate": "prisma generate",
