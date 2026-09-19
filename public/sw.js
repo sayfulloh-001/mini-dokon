@@ -1,11 +1,11 @@
-self.addEventListener('install', (event) => {
+self.addEventListener("install", (e) => {
   self.skipWaiting();
 });
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
+self.addEventListener("activate", (e) => {
+  e.waitUntil(self.clients.claim());
 });
 
-self.addEventListener('fetch', (event) => {
-  // Allow normal network requests
+self.addEventListener("fetch", (e) => {
+  // Pass through
 });
