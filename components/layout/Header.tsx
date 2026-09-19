@@ -23,7 +23,7 @@ function HeaderContent({
   const searchParams = useSearchParams();
   const currentCode = storeCode || searchParams.get("code") || "";
 
-  const { isInstalled, promptInstall, showIosGuide, setShowIosGuide, isIos } = usePwaInstall();
+  const { isInstalled, isMounted, promptInstall, showIosGuide, setShowIosGuide, isIos } = usePwaInstall();
 
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -80,7 +80,7 @@ function HeaderContent({
           </div>
 
           <div className="flex items-center gap-1.5">
-            {!isInstalled && (
+            {isMounted && !isInstalled && (
               <button
                 onClick={promptInstall}
                 className="flex items-center gap-1 px-2.5 py-1 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-all font-bold text-xs cursor-pointer shadow-2xs"

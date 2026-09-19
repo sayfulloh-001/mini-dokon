@@ -8,12 +8,14 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function usePwaInstall() {
-  const [isInstalled, setIsInstalled] = useState<boolean>(true); // Default true during SSR to prevent flash
+  const [isInstalled, setIsInstalled] = useState<boolean>(false);
+  const [isMounted, setIsMounted] = useState<boolean>(false);
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showIosGuide, setShowIosGuide] = useState<boolean>(false);
   const [isIos, setIsIos] = useState<boolean>(false);
 
   useEffect(() => {
+    setIsMounted(true);
     if (typeof window === 'undefined') return;
 
     // 1. Service Worker ro'yxatdan o'tkazish
@@ -21,13 +23,12 @@ export function usePwaInstall() {
       navigator.serviceWorker.register('/sw.js').catch(() => {});
     }
 
-    // 2. Ilova allaqachon o'rnatilganligini tekshirish
+    // 2. Ilova allaqachon o'rnatilganligini (Standalone rejim) tekshirish
     const checkInstalled = () => {
       const isStandalone =
         window.matchMedia('(display-mode: standalone)').matches ||
         (window.navigator as unknown as { standalone?: boolean }).standalone === true ||
-        document.referrer.includes('android-app://') ||
-        localStorage.getItem('sy_tizim_installed') === 'true';
+        document.referrer.includes('android-app://');
 
       setIsInstalled(Boolean(isStandalone));
     };
@@ -101,6 +102,7 @@ export function usePwaInstall() {
 
   return {
     isInstalled,
+    isMounted,
     promptInstall,
     showIosGuide,
     setShowIosGuide,

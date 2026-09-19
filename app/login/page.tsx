@@ -8,7 +8,7 @@ import { InstallModal } from "@/components/pwa/InstallModal";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { isInstalled, promptInstall, showIosGuide, setShowIosGuide, isIos } = usePwaInstall();
+  const { isInstalled, isMounted, promptInstall, showIosGuide, setShowIosGuide, isIos } = usePwaInstall();
   const [inputVal, setInputVal] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -114,7 +114,7 @@ export default function LoginPage() {
         </form>
 
         {/* Agar o'rnatilmagan bo'lsa: Ilovani yuklab olish tugmasi */}
-        {!isInstalled && (
+        {isMounted && !isInstalled && (
           <div className="mt-5 pt-4 border-t border-slate-100 text-center">
             <button
               type="button"
